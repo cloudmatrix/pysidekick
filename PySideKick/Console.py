@@ -10,20 +10,26 @@ embedded in your GUI.
 
 """
 
-import sys
 from code import InteractiveConsole as _InteractiveConsole
+import sys
 
-from PySideKick import QtCore, QtGui
+try:
+    from PySideKick import QtCore, QtGui
+except ImportError:
+    from PySide import QtCore, QtGui
 
 try:
     from cStringIO import StringIO
 except ImportError:
-    from StringIO import StringIO
+    try:
+        from StringIO import StringIO
+    except ImportError:
+        from io import StringIO
 
 
 class _QPythonConsoleInterpreter(_InteractiveConsole):
     """InteractiveConsole subclass that sends all output to the GUI."""
- 
+
     def __init__(self,ui,locals=None):
         _InteractiveConsole.__init__(self,locals)
         self.ui = ui
@@ -112,7 +118,7 @@ class QPythonConsole(QtGui.QWidget):
             self.ui.prompt.setText("... ")
         else:
             self.ui.prompt.setText(">>> ")
-        
+
     def eventFilter(self,obj,event):
         if event.type() == QtCore.QEvent.KeyPress:
             if event.key() == QtCore.Qt.Key_Up:
@@ -134,10 +140,8 @@ class QPythonConsole(QtGui.QWidget):
 
 
 if __name__ == "__main__":
-    import sys, os
     app = QtGui.QApplication(sys.argv)
     win = QtGui.QMainWindow()
     win.setCentralWidget(QPythonConsole())
     win.show()
     app.exec_()
-
